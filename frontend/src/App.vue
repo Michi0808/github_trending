@@ -1,0 +1,109 @@
+<template>
+    <div class="container mx-auto p-4">
+      <h1 class="text-3xl font-bold text-center mb-6">GitHub Trending Repositories</h1>
+
+      <!-- 🔎 Search Form -->
+      <div class="flex flex-col md:flex-row gap-2 mb-6">
+        <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="Search by repository name..."
+          class="p-2 border rounded w-full md:w-1/3"
+        />
+        <select v-model="selectedLanguage" class="p-2 border rounded w-full md:w-1/4">
+          <option value="">All Languages</option>
+          <option v-for="lang in languages" :key="lang" :value="lang">{{ lang }}</option>
+        </select>
+        <input
+          type="number"
+          v-model.number="minStars"
+          placeholder="Min Stars"
+          class="p-2 border rounded w-full md:w-1/4"
+        />
+        <button @click="fetchRepositories" class="p-2 bg-blue-500 text-white rounded">
+          Search
+        </button>
+      </div>
+
+      <!-- 🔹 Repository List (Table View) -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-gray-900 text-white border border-gray-700 rounded-lg">
+          <thead class="bg-gray-800">
+            <tr>
+              <th class="py-2 px-4 border-b">Repository</th>
+              <th class="py-2 px-4 border-b">Stars</th>
+              <th class="py-2 px-4 border-b">Language</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="repo in filteredRepositories" :key="repo.id" class="border-b hover:bg-gray-700">
+              <td class="py-2 px-4">
+                <a :href="repo.url" target="_blank" class="text-blue-400 hover:underline">
+                  {{ repo.repo_name }}
+                </a>
+              </td>
+              <td class="py-2 px-4 text-yellow-400">⭐ {{ repo.stars }}</td>
+              <td class="py-2 px-4">{{ repo.language || "Unknown" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+
+  <script>
+  import { ref, computed, onMounted } from "vue";
+  import { createClient } from "@supabase/supabase-js";
+
+  // 🔹 Supabase configuration
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  export default {
+    setup() {
+      const repositories = ref([]); // Repository data list
+      const searchQuery = ref(""); // Search keyword for repository name
+      const selectedLanguage = ref(""); // Selected programming language
+      const minStars = ref(0); // Minimum star count filter
+      const languages = ref([]); // List of available programming languages
+
+      // 🔹 Fetch repository data from Supabase
+      const fetchRepositories = async () => {
+        const { data, error } = await supabase.from("repositories").select("*");
+        if (error) {
+          console.error("Error fetching repositories:", error);
+        } else {
+          repositories.value = data;
+
+          // Extract unique programming languages from the fetched data
+          languages.value = [...new Set(data.map(repo => repo.language).filter(Boolean))];
+        }
+      };
+
+      // 🔍 Filter repositories based on search conditions
+      const filteredRepositories = computed(() => {
+        return repositories.value.filter(repo => {
+          const matchesQuery = repo.repo_name.toLowerCase().includes(searchQuery.value.toLowerCase());
+          const matchesLanguage = selectedLanguage.value ? repo.language === selectedLanguage.value : true;
+          const matchesStars = repo.stars >= minStars.value;
+
+          return matchesQuery && matchesLanguage && matchesStars;
+        });
+      });
+
+      // Fetch repositories on component mount
+      onMounted(fetchRepositories);
+
+      return {
+        repositories,
+        searchQuery,
+        selectedLanguage,
+        minStars,
+        languages,
+        fetchRepositories,
+        filteredRepositories
+      };
+    }
+  };
+  </script>
