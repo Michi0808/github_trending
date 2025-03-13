@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -31,6 +31,7 @@ return [
 
     'connections' => [
 
+            /*
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
@@ -41,6 +42,7 @@ return [
             'journal_mode' => null,
             'synchronous' => null,
         ],
+    */
 
         'mysql' => [
             'driver' => 'mysql',
