@@ -27,6 +27,9 @@ COPY . .
 # Create necessary directories and set permissions
 RUN mkdir -p storage bootstrap/cache && chmod -R 775 storage bootstrap/cache
 
+# Clear and cache Laravel configurations
+RUN php artisan config:clear && php artisan cache:clear
+
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
