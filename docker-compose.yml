@@ -15,10 +15,29 @@ services:
         environment:
             - APP_ENV=production
             - APP_DEBUG=false
-            - APP_KEY=${APP_KEY} # Use APP_KEY from .env
+            - APP_KEY=SUMyYMGqYAPeAujwgaKlYZWGt32CUmtEf6SScctRixg=
             - DB_CONNECTION=pgsql
-            - DB_HOST=aws-0-us-west-1.pooler.supabase.com # Supabase host
+            - DB_HOST=aws-0-us-west-1.pooler.supabase.com
             - DB_PORT=5432
             - DB_DATABASE=postgres
             - DB_USERNAME=postgres.oaxujrkdukrqvftqngsc
             - DB_PASSWORD=MudzzVCir4XjjMAx
+            - PORT=8000
+        depends_on:
+            - db
+
+    db:
+        image: postgres:15
+        container_name: laravel_db
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres.oaxujrkdukrqvftqngsc
+            POSTGRES_PASSWORD: MudzzVCir4XjjMAx
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+
+volumes:
+    pgdata:
