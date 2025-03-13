@@ -32,11 +32,8 @@ RUN mkdir -p storage bootstrap/cache && chmod -R 775 storage bootstrap/cache && 
 # ✅ Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# ✅ Clear and cache Laravel configurations
-RUN php artisan config:clear && php artisan cache:clear
-
-# Expose port 8000 for Laravel
+# ✅ Expose port 8000 for Laravel
 EXPOSE 8000
 
-# Start Laravel development server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# ✅ Move config clear/cache to CMD so it runs at container startup
+CMD ["sh", "-c", "php artisan config:clear && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=8000"]
