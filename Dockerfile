@@ -15,8 +15,10 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     git \
+    libpq-dev \
     && docker-php-ext-configure gd \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-enable pdo_pgsql
 
 # Install Composer globally
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
