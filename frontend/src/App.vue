@@ -37,12 +37,10 @@
   <script>
   import { ref, computed, onMounted } from "vue";
   import SearchForm from "./components/SearchForm.vue";
-  import { createClient } from "@supabase/supabase-js";
+  import axios from "axios";
 
-  // 🔹 Supabase Config
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  // 🔹 API Base URL from environment variables
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   export default {
     components: { SearchForm },
@@ -53,16 +51,16 @@
       const minStars = ref(0);
       const languages = ref([]);
 
-      // 🔹 Fetch repository data
+      // 🔹 Fetch repository data from Laravel API
       const fetchRepositories = async () => {
-        const { data, error } = await supabase.from("repositories").select("*");
-        if (error) {
-          console.error("Error fetching repositories:", error);
-        } else {
-          repositories.value = data;
+        try {
+          const response = await axios.get(`${API_BASE_URL}/api/repositories`);
+          repositories.value = response.data;
 
           // Extract unique programming languages
-          languages.value = [...new Set(data.map(repo => repo.language).filter(Boolean))];
+          languages.value = [...new Set(response.data.map(repo => repo.language).filter(Boolean))];
+        } catch (error) {
+          console.error("Error fetching repositories:", error);
         }
       };
 
