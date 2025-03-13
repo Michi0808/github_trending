@@ -24,14 +24,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy existing application files
 COPY . .
 
-# ✅ Install PHP dependencies before running artisan commands
+# ✅ Create necessary directories and set permissions BEFORE composer install
+RUN mkdir -p storage bootstrap/cache && chmod -R 775 storage bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache
+
+# ✅ Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# ✅ Create necessary directories and set permissions
-RUN mkdir -p storage bootstrap/cache && chmod -R 775 storage bootstrap/cache
-
-# ✅ Ensure vendor/autoload.php exists before running artisan commands
-RUN test -f vendor/autoload.php && php artisan config:clear && php artisan cache:clear || echo "Skipping artisan commands"
+# ✅ Clear and cache Laravel configurations
+RUN php artisan config:clear && php artisan cache:clear
 
 # Expose port 8000 for Laravel
 EXPOSE 8000
