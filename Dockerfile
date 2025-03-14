@@ -26,7 +26,10 @@ RUN docker-php-ext-enable pdo_pgsql
 # Install Composer globally
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy Laravel application files explicitly
+# Copy entire application first
+COPY . /var/www
+
+# Then ensure public/index.php exists
 COPY public /var/www/public
 
 # Ensure public/index.php exists
