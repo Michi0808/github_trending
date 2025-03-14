@@ -30,16 +30,15 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # ✅ Create necessary directories and set permissions BEFORE composer install
-RUN mkdir -p storage bootstrap/cache public/build && \
-    chmod -R 775 storage bootstrap/cache public/build && \
-    chown -R www-data:www-data storage bootstrap/cache public/build
+RUN mkdir -p storage bootstrap/cache public && \
+    chmod -R 775 storage bootstrap/cache public && \
+    chown -R www-data:www-data storage bootstrap/cache public
 
 # ✅ Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
 # ✅ Install Node.js dependencies and build frontend assets
-RUN npm install && npm run build
-
+RUN npm ci && npm run build
 
 # ✅ Expose port 8000 for Laravel
 EXPOSE 8000

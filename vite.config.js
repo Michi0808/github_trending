@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
@@ -10,7 +9,6 @@ export default defineConfig({
             refresh: true,
         }),
         vue(),
-        tailwindcss(),
     ],
     server: {
         proxy: {
@@ -23,7 +21,7 @@ export default defineConfig({
         origin: 'https://github-trending-wpgw.onrender.com',
     },
     build: {
-        outDir: 'public/build',
+        outDir: 'public/',  // Fix: Output directly to public/
         emptyOutDir: true,
     },
 });
