@@ -8,7 +8,7 @@ WORKDIR /var/www
 RUN apt-get update && apt-get install -y \
     unzip \
     curl \
-    netcat \
+    netcat-openbsd \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
