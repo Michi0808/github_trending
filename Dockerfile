@@ -59,5 +59,5 @@ RUN chmod +x /usr/local/bin/clear_cache.sh
 # ✅ Expose port 8000 for Laravel & Nginx (80)
 EXPOSE 8000 80
 
-# ✅ Final CMD: Ensure `public/index.php`, wait for DB, start Nginx & Laravel
-CMD ["/bin/sh", "-c", "ls -lah /var/www/public && sleep 10 && wait-for-db.sh && service nginx start && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan serve --host=0.0.0.0 --port=8000"]
+# ✅ Final CMD: Start Nginx & PHP-FPM instead of php artisan serve
+CMD ["/bin/sh", "-c", "ls -lah /var/www/public && sleep 10 && wait-for-db.sh && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && nginx -g 'daemon off;'"]
