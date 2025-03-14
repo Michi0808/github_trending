@@ -8,6 +8,7 @@ WORKDIR /var/www
 RUN apt-get update && apt-get install -y \
     unzip \
     curl \
+    netcat \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
@@ -59,5 +60,5 @@ RUN chmod +x /usr/local/bin/clear_cache.sh
 # ✅ Expose port 8000 for Laravel & Nginx (80)
 EXPOSE 8000 80
 
-# ✅ Final CMD: Start Nginx & PHP-FPM instead of php artisan serve
-CMD ["/bin/sh", "-c", "ls -lah /var/www/public && sleep 10 && wait-for-db.sh && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && nginx -g 'daemon off;'"]
+# ✅ Final CMD: Start PHP-FPM & Nginx
+CMD ["/bin/sh", "-c", "ls -lah /var/www/public && sleep 10 && wait-for-db.sh && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && service php8.2-fpm start && service nginx start && tail -f /var/log/nginx/access.log /var/log/nginx/error.log"]
