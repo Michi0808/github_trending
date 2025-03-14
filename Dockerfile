@@ -26,19 +26,25 @@ RUN docker-php-ext-enable pdo_pgsql
 # Install Composer globally
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy existing application files
-COPY . .
+# Copy Laravel application files explicitly
+COPY . /var/www
+
+# Ensure public/index.php exists
+RUN mkdir -p public && touch public/index.php && chmod -R 775 public
 
 # ✅ Create necessary directories and set permissions BEFORE composer install
-RUN mkdir -p storage bootstrap/cache public && \
+RUN mkdir -p storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache public && \
     chown -R www-data:www-data storage bootstrap/cache public
 
 # ✅ Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --optimize-autoloader
 
 # ✅ Install Node.js dependencies and build frontend assets
 RUN npm ci && npm run build
+
+# ✅ Ensure Laravel is properly set up
+RUN php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear
 
 # ✅ Expose port 8000 for Laravel
 EXPOSE 8000
