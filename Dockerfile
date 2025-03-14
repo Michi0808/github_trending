@@ -54,4 +54,5 @@ RUN chmod +x /usr/local/bin/clear_cache.sh
 EXPOSE 8000
 
 # ✅ Final CMD ensures `public/index.php` & starts the server
-CMD ["sh", "-c", "ls -lah /var/www/public && clear_cache.sh && php artisan serve --host=0.0.0.0 --port=8000"]
+CMD ["sh", "-c", "ls -lah /var/www/public && sleep 10 && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan serve --host=0.0.0.0 --port=8000"]
+
