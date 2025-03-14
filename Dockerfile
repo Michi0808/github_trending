@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-enable pdo_pgsql
 
-# Install Composer globally
+# Install Composer globally _
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy Laravel application
