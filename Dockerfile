@@ -34,6 +34,7 @@ COPY public /var/www/public
 
 # ✅ Copy Nginx configuration
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # Ensure public/index.php exists before proceeding
 RUN if [ ! -f "/var/www/public/index.php" ]; then echo "<?php echo 'index.php missing!';" > /var/www/public/index.php; fi
