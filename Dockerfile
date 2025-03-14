@@ -31,6 +31,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy Laravel application
 COPY . /var/www
+COPY public/index.php /var/www/public/index.php
 RUN chown -R www-data:www-data /var/www/public && chmod -R 755 /var/www/public
 
 # ✅ Copy Nginx configuration
