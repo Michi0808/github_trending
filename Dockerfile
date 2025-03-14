@@ -43,11 +43,12 @@ RUN composer install --optimize-autoloader
 # ✅ Install Node.js dependencies and build frontend assets
 RUN npm ci && npm run build
 
-# ✅ Ensure Laravel is properly set up
-RUN php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear
+# ✅ Copy cache clear script & set execute permissions
+COPY clear_cache.sh /usr/local/bin/clear_cache.sh
+RUN chmod +x /usr/local/bin/clear_cache.sh
 
 # ✅ Expose port 8000 for Laravel
 EXPOSE 8000
 
-# ✅ Move config clear/cache to CMD so it runs at container startup
-CMD ["sh", "-c", "php artisan config:clear && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=8000"]
+# ✅ Run cache clear script at container startup
+CMD ["sh", "-c", "clear_cache.sh && php artisan serve --host=0.0.0.0 --port=8000"]
