@@ -61,4 +61,4 @@ RUN chmod +x /usr/local/bin/clear_cache.sh
 EXPOSE 8000 80
 
 # ✅ Final CMD: Start PHP-FPM & Nginx
-CMD ["/bin/sh", "-c", "ls -lah /var/www/public && sleep 10 && wait-for-db.sh && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && service php8.2-fpm start && nginx -g 'daemon off;'"]
+CMD ["/bin/sh", "-c", "ls -lah /var/www/public && sleep 10 && wait-for-db.sh && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php-fpm -D && nginx -g 'daemon off;'"]
