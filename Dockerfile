@@ -26,14 +26,11 @@ RUN docker-php-ext-enable pdo_pgsql
 # Install Composer globally
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy entire application first
+# Copy Laravel application
 COPY . /var/www
 
-# Then ensure public/index.php exists
-COPY public /var/www/public
-
-# Ensure public/index.php exists
-RUN mkdir -p public && touch public/index.php && chmod -R 775 public
+# Ensure public/index.php exists before proceeding
+RUN if [ ! -f "/var/www/public/index.php" ]; then echo "<?php echo 'index.php missing!';" > /var/www/public/index.php; fi
 
 # ✅ Create necessary directories and set permissions BEFORE composer install
 RUN mkdir -p storage bootstrap/cache && \
@@ -41,10 +38,13 @@ RUN mkdir -p storage bootstrap/cache && \
     chown -R www-data:www-data storage bootstrap/cache public
 
 # ✅ Install PHP dependencies
-RUN composer install --optimize-autoloader
+RUN composer install --optimize-autoloader --no-dev
 
 # ✅ Install Node.js dependencies and build frontend assets
 RUN npm ci && npm run build
+
+# ✅ Ensure Laravel is properly set up
+RUN php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear
 
 # ✅ Copy cache clear script & set execute permissions
 COPY clear_cache.sh /usr/local/bin/clear_cache.sh
@@ -53,5 +53,5 @@ RUN chmod +x /usr/local/bin/clear_cache.sh
 # ✅ Expose port 8000 for Laravel
 EXPOSE 8000
 
-# ✅ Run cache clear script at container startup
-CMD ["sh", "-c", "clear_cache.sh && php artisan serve --host=0.0.0.0 --port=8000"]
+# ✅ Final CMD ensures `public/index.php` & starts the server
+CMD ["sh", "-c", "ls -lah /var/www/public && clear_cache.sh && php artisan serve --host=0.0.0.0 --port=8000"]
