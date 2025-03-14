@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm \
     nginx \
+    gettext-base \
     && docker-php-ext-configure gd \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd
 
