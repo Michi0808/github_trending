@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     nodejs \
     npm \
+    nginx \
     && docker-php-ext-configure gd \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd
 
@@ -29,6 +30,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy Laravel application
 COPY . /var/www
 COPY public /var/www/public
+
+# ✅ Copy Nginx configuration
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Ensure public/index.php exists before proceeding
 RUN if [ ! -f "/var/www/public/index.php" ]; then echo "<?php echo 'index.php missing!';" > /var/www/public/index.php; fi
@@ -52,8 +56,8 @@ RUN chmod +x /usr/local/bin/wait-for-db.sh
 COPY clear_cache.sh /usr/local/bin/clear_cache.sh
 RUN chmod +x /usr/local/bin/clear_cache.sh
 
-# ✅ Expose port 8000 for Laravel
-EXPOSE 8000
+# ✅ Expose port 8000 for Laravel & Nginx (80)
+EXPOSE 8000 80
 
-# ✅ Final CMD: Ensure `public/index.php`, wait for DB, then start Laravel
-CMD ["/bin/sh", "-c", "ls -lah /var/www/public && sleep 10 && wait-for-db.sh && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan serve --host=0.0.0.0 --port=8000"]
+# ✅ Final CMD: Ensure `public/index.php`, wait for DB, start Nginx & Laravel
+CMD ["/bin/sh", "-c", "ls -lah /var/www/public && sleep 10 && wait-for-db.sh && service nginx start && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan serve --host=0.0.0.0 --port=8000"]
