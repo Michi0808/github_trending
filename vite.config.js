@@ -20,6 +20,7 @@ export default defineConfig({
                 secure: false,
             },
         },
+        origin: 'https://github-trending-wpgw.onrender.com',
     },
     build: {
         outDir: 'public/build',
