@@ -48,9 +48,6 @@ RUN npm ci && npm run build
 COPY wait-for-db.sh /usr/local/bin/wait-for-db.sh
 RUN chmod +x /usr/local/bin/wait-for-db.sh
 
-# ✅ Ensure Laravel is properly set up
-RUN php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear
-
 # ✅ Copy cache clear script & set execute permissions
 COPY clear_cache.sh /usr/local/bin/clear_cache.sh
 RUN chmod +x /usr/local/bin/clear_cache.sh
@@ -58,8 +55,5 @@ RUN chmod +x /usr/local/bin/clear_cache.sh
 # ✅ Expose port 8000 for Laravel
 EXPOSE 8000
 
-# ✅ Ensure database is ready before clearing config
-RUN /usr/local/bin/wait-for-db.sh
-
-# ✅ Ensure Laravel is properly set up
-RUN php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear
+# ✅ Final CMD: Ensure `public/index.php`, wait for DB, then start Laravel
+CMD ["/bin/sh", "-c", "ls -lah /var/www/public && sleep 10 && wait-for-db.sh && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan serve --host=0.0.0.0 --port=8000"]
