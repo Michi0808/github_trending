@@ -27,7 +27,7 @@ RUN docker-php-ext-enable pdo_pgsql
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy Laravel application files explicitly
-COPY . /var/www
+COPY public /var/www/public
 
 # Ensure public/index.php exists
 RUN mkdir -p public && touch public/index.php && chmod -R 775 public
