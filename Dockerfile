@@ -16,8 +16,11 @@ RUN apt-get update && apt-get install -y \
     zip \
     git \
     libpq-dev \
+    nodejs \
+    npm \
     && docker-php-ext-configure gd \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd
+
 RUN docker-php-ext-enable pdo_pgsql
 
 # Install Composer globally
@@ -27,10 +30,15 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # ✅ Create necessary directories and set permissions BEFORE composer install
-RUN mkdir -p storage bootstrap/cache && chmod -R 775 storage bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache
+RUN mkdir -p storage bootstrap/cache public/build && \
+    chmod -R 775 storage bootstrap/cache public/build && \
+    chown -R www-data:www-data storage bootstrap/cache public/build
 
 # ✅ Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
+
+# ✅ Install Node.js dependencies and build frontend assets
+RUN npm install && npm run build
 
 # ✅ Expose port 8000 for Laravel
 EXPOSE 8000
